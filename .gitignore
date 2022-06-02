@@ -1,5 +1,6 @@
-/plugin/
 /.report/
 /.idea/
-/.phpunit.result.cache
-!/plugin/terrazza/
+/plugin/bin/
+/plugin/composer/
+/plugin/psr/
+/plugin/autoload.php

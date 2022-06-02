@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         colors="true"
+         stopOnFailure="true"
+         bootstrap="plugin/autoload.php"
+         cacheResult ="false"
+         failOnRisky="true"
+         failOnWarning="true"
+         defaultTestSuite="all">
+  <coverage>
+    <include>
+      <directory>./</directory>
+    </include>
+    <exclude>
+      <directory>./plugin</directory>
+      <directory>./tests</directory>
+    </exclude>
+    <report>
+      <html outputDirectory="./.report"/>
+    </report>
+  </coverage>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+  </php>
+  <testsuites>
+    <testsuite name="all">
+      <directory>./tests/Common</directory>
+      <directory>./tests/Converter</directory>
+      <directory>./tests/Builder</directory>
+      <directory>./tests/Formatter</directory>
+      <directory>./tests/Handler</directory>
+      <directory>./tests/Record</directory>
+      <directory>./tests/Utility</directory>
+      <directory>./tests/Writer</directory>
+      <directory>./tests/_Examples</directory>
+    </testsuite>
+    <testsuite name="Common">
+      <directory>./tests/Common</directory>
+    </testsuite>
+    <testsuite name="Converter">
+      <directory>./tests/Converter</directory>
+    </testsuite>
+    <testsuite name="Builder">
+      <directory>./tests/Builder</directory>
+    </testsuite>
+    <testsuite name="Formatter">
+      <directory>./tests/Formatter</directory>
+    </testsuite>
+    <testsuite name="Handler">
+      <directory>./tests/Handler</directory>
+    </testsuite>
+    <testsuite name="Record">
+      <directory>./tests/Record</directory>
+    </testsuite>
+    <testsuite name="Utility">
+      <directory>./tests/Utility</directory>
+    </testsuite>
+    <testsuite name="Writer">
+      <directory>./tests/Writer</directory>
+    </testsuite>
+    <testsuite name="Examples">
+      <directory>./tests/_Examples</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

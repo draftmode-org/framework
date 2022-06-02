@@ -1,0 +1,36 @@
+{
+    "name": "terrazza/logger",
+    "type" : "library",
+    "version": "1.0.0",
+    "description": "logger",
+    "license": "MIT",
+    "config" : {
+        "vendor-dir" : "plugin"
+    },
+    "authors": [
+        {
+            "name": "Peter Fux",
+            "email": "it@noframework.io"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "psr/log": "1.*"
+    },
+    "require-dev" : {
+        "phpunit/phpunit": "^9.3",
+        "vimeo/psalm": "4.x-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terrazza\\Component\\Logger\\" : "src",
+            "Terrazza\\Component\\Logger\\Utility\\" : "utility"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Terrazza\\Component\\Logger\\Tests\\_Mocks\\" : "tests/_Mocks"
+        }
+    },
+    "minimum-stability": "dev"
+}

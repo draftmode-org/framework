@@ -1,0 +1,25 @@
+{
+    "name": "terrazza/http-routing",
+    "type" : "library",
+    "version": "2.0.0",
+    "description": "http routing",
+    "license": "MIT",
+    "config" : {
+        "vendor-dir" : "plugin"
+    },
+    "authors": [
+        {
+            "name": "Peter Fux",
+            "email": "it@noframework.io"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terrazza\\Http\\Routing" : "src"
+        }
+    },
+    "minimum-stability": "dev"
+}
