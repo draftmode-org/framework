@@ -1,9 +1,0 @@
-
-2022-06-03 00:27:04.731329 : (#) routing for uri: /payments/12124548 / method: post found 
-2022-06-03 00:27:04.731657 : (#) Terrazza\Framework\Controller\Http\HttpPaymentGetController without arguments Context:{"line":129,"method":"Terrazza\\Injector\\Injector::instantiate","arguments":null}
-2022-06-03 00:27:04.731918 : (#) get mapping for Terrazza\Framework\Controller\Http\HttpPaymentGetController Context:{"line":185,"method":"Terrazza\\Injector\\Injector::getMapping"}
-2022-06-03 00:27:04.732165 : (#) initialize new mapping Context:{"line":202,"method":"Terrazza\\Injector\\Injector::loadMapping"}
-2022-06-03 00:27:04.732411 : (#) classMapping is array, provide it as mapping Context:{"line":205,"method":"Terrazza\\Injector\\Injector::loadMapping"}
-2022-06-03 00:27:04.732655 : (#) mappingKey not found by loadMapping Context:{"line":191,"method":"Terrazza\\Injector\\Injector::getMapping"}
-2022-06-03 00:27:04.733478 : (#) Terrazza\Framework\Controller\Http\HttpPaymentGetController class exists Context:{"line":164,"method":"Terrazza\\Injector\\Injector::instantiate"}
-2022-06-03 00:27:04.733752 : (#) class Terrazza\Framework\Controller\Http\HttpPaymentGetController has no constructor Context:{"line":280,"method":"Terrazza\\Injector\\Injector::getClassArgs"}
