@@ -1,0 +1,47 @@
+{
+  "name": "terrazza/framework",
+  "description": "description",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "config" : {
+    "vendor-dir" : "plugin"
+  },
+  "authors": [
+    {
+      "name": "Peter Fux",
+      "email": "it@noframework.io"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "psr/log": "1.1.*",
+    "psr/http-message": "1.*",
+    "psr/http-client": "1.*",
+    "psr/http-factory": "1.*",
+    "psr/http-server-handler": "1.*",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-fileinfo": "*",
+    "psr/container": "1.*",
+    "ext-libxml": "*",
+    "ext-yaml": "*"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/terrazza/logger.git"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Terrazza\\Framework\\" : "src",
+      "Terrazza\\Routing\\" : "plugin/terrazza/routing/src",
+      "Terrazza\\Http\\Routing\\" : "plugin/terrazza/http-routing/src",
+      "Terrazza\\Http\\Routing\\OpenApi\\" : "plugin/terrazza/http-routing-open-api/src",
+      "Terrazza\\Http\\" : "plugin/terrazza/http/src",
+      "Terrazza\\Logger\\" : "plugin/terrazza/logger/src",
+      "Terrazza\\Logger\\Utility\\" : "plugin/terrazza/logger/utility",
+      "Terrazza\\Injector\\" : "plugin/terrazza/injector/src"
+    }
+  }
+}

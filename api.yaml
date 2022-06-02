@@ -1,0 +1,250 @@
+openapi: 3.0.3
+info:
+  title: api.yaml
+  description: Title
+  version: 1.0.0
+servers:
+  - url: '/api/'
+tags:
+  - name: Payment
+paths:
+  "/animals":
+    post:
+      operationId: animals_post
+      requestBody:
+        $ref: "#/components/requestBodies/Animals"
+      responses:
+        200:
+          $ref: "#/components/responses/200"
+  "/payments":
+    post:
+      tags:
+        - Payments
+      summary:
+        create new payment
+      operationId: payment_create
+      requestBody:
+        $ref: "#/components/requestBodies/PaymentPost"
+      responses:
+        201:
+          $ref: "#/components/responses/201"
+        400:
+          $ref: "#/components/responses/400"
+    get:
+      parameters:
+        - in: query
+          required: true
+          name: "paymentFrom"
+          schema:
+            $ref: "#/components/schemas/PaymentDateFrom"
+        - in: query
+          name: "paymentState"
+          schema:
+            $ref: "#/components/schemas/PaymentState"
+        - in: cookie
+          required: false
+          name: "user-name"
+          schema:
+            $ref: "#/components/schemas/UserName"
+        - in: header
+          required: false
+          name: "user-name"
+          schema:
+            $ref: "#/components/schemas/UserName"
+      tags:
+        - Payments
+      summary:
+        list payments
+      operationId: payment_list
+      responses:
+        200:
+          description: list of payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentId'
+
+  "/payments/{PaymentId}":
+    parameters:
+      - in: path
+        required: true
+        name: PaymentId
+        schema:
+          $ref: "#/components/schemas/PaymentId"
+      - in: query
+        required: false
+        name: "id"
+        schema:
+          $ref: "#/components/schemas/PaymentId"
+    patch:
+      tags:
+        - Payment
+      summary:
+        patch new payment
+      operationId: payment_patch
+      requestBody:
+        $ref: "#/components/requestBodies/PaymentPost"
+      responses:
+        201:
+          $ref: "#/components/responses/201"
+        400:
+          $ref: "#/components/responses/400"
+    get:
+      tags:
+        - Payment
+      summary:
+        get payment detail by id
+      parameters:
+        - in: query
+          name: paymentFrom
+          schema:
+            $ref: "#/components/schemas/PaymentDateFrom"
+      operationId: payment_getView
+      responses:
+        200:
+          $ref: '#/components/responses/PaymentGetView'
+        400:
+          description: 'returns a list of vehicles'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentId'
+    post:
+      tags:
+        - Payment
+      summary:
+        update payment
+      operationId: payment_update
+      requestBody:
+        $ref: "#/components/requestBodies/PaymentPost"
+      responses:
+        200:
+          $ref: "#/components/responses/200"
+  "/payment/{PaymentId}/items":
+    get:
+      tags:
+        - Payment
+      summary:
+        get payment items by payment id
+      operationId: payment_getItems
+      parameters:
+        - in: path
+          name: PaymentId
+          schema:
+            $ref: "#/components/schemas/PaymentId"
+      responses:
+        200:
+          $ref: "#/components/responses/200"
+  "/type":
+    post:
+      operationId: post_type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              required: true
+      responses:
+        200:
+          $ref: "#/components/responses/200"
+components:
+  requestBodies:
+    Animals:
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/AnimalDog"
+              - $ref: "#/components/schemas/AnimalCat"
+              - type: integer
+    PaymentPost:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - PaymentDate
+            properties:
+              PaymentDate:
+                $ref: "#/components/schemas/PaymentDate"
+              PaymentState:
+                $ref: "#/components/schemas/PaymentState"
+              Customer:
+                $ref: "#/components/schemas/Customer"
+  responses:
+    PaymentGetView:
+      description: "payment entity"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                $ref: "#/components/schemas/PaymentId"
+    200:
+      description: successful
+    201:
+      description: created successful
+    400:
+      description: invalid argument(s)
+  schemas:
+    UserName:
+      type: string
+      minLength: 10
+    PaymentDateFrom:
+      $ref: "#/components/schemas/PaymentDate"
+    PaymentDateTo:
+      $ref: "#/components/schemas/PaymentDate"
+    PaymentDate:
+      type: string
+      format: date
+    PaymentId:
+      type: string
+      maxLength: 5
+    PaymentState:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+    Customer:
+      type: object
+      properties:
+        firstName:
+          $ref: "#/components/schemas/firstName"
+    firstName:
+      type: string
+      maxLength: 10
+    date:
+      type: string
+      format: date
+    AnimalDog:
+      type: object
+      required:
+        - dogName
+      properties:
+        dogName:
+          type: string
+        age:
+          type: number
+    AnimalCat:
+      type: object
+      required:
+        - catName
+      properties:
+        catName:
+          type: string
+        age:
+          type: number
+    PaymentItem:
+      type: object
+      properties:
+        amount:
+          type: number
+          required: true
+        tax:
+          type: integer
