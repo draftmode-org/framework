@@ -31,4 +31,15 @@ interface LoggerInterface extends PsrLoggerInterface {
      * @return LoggerInterface
      */
     public function registerChannelHandler(ChannelHandlerInterface $channelHandler) : LoggerInterface;
+
+    /**
+     * @param string $namespace
+     * @return LoggerInterface
+     */
+    public function withNamespace(string $namespace) : LoggerInterface;
+
+    /**
+     * @return string
+     */
+    public function getNamespace() : string;
 }

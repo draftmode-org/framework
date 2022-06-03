@@ -28,6 +28,7 @@ class Logger implements LoggerInterface {
         self::EMERGENCY                             => 'EMERGENCY'
     ];
 
+    private string $namespace;
     private string $loggerName;
     private array $context;
     /**
@@ -49,6 +50,7 @@ class Logger implements LoggerInterface {
         $this->loggerName                           = $loggerName;
         $this->context                              = $context ?? [];
         $this->channelHandler                       = $channelHandler;
+        $this->namespace                            = "";
     }
 
     /**
@@ -136,6 +138,23 @@ class Logger implements LoggerInterface {
     }
 
     /**
+     * @param string $namespace
+     * @return LoggerInterface
+     */
+    public function withNamespace(string $namespace): LoggerInterface {
+        $logger                                     = clone $this;
+        $logger->namespace                          = $namespace;
+        return $logger;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamespace(): string {
+        return $this->namespace;
+    }
+
+    /**
      * @param int $shifts
      * @return LogRecordTrace
      */
@@ -169,6 +188,7 @@ class Logger implements LoggerInterface {
         $record = LogRecord::createRecord(
             $this->loggerName,
             $logLevel,
+            $this->namespace,
             $message,
             $this->getTrace(),
             $context,

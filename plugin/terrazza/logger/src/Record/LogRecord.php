@@ -8,6 +8,7 @@ class LogRecord {
     private \DateTime $logDate;
     private string $loggerName;
     private int $logLevel;
+    private string $namespace;
     private string $logMessage;
     private LogRecordTrace $trace;
     private array $context;
@@ -19,6 +20,7 @@ class LogRecord {
      * @param DateTime $logDate
      * @param string $loggerName
      * @param int $logLevel
+     * @param string $namespace
      * @param string $logMessage
      * @param float $memUsed
      * @param float $memAllocated
@@ -29,6 +31,7 @@ class LogRecord {
     public function __construct(DateTime $logDate,
                                 string $loggerName,
                                 int $logLevel,
+                                string $namespace,
                                 string $logMessage,
                                 float $memUsed,
                                 float $memAllocated,
@@ -39,6 +42,7 @@ class LogRecord {
         $this->logDate                              = $logDate;
         $this->loggerName                           = $loggerName;
         $this->logLevel                             = $logLevel;
+        $this->namespace                            = $namespace;
         $this->logMessage                           = $logMessage;
         $this->memUsed                           	= $memUsed;
         $this->memAllocated                         = $memAllocated;
@@ -58,6 +62,7 @@ class LogRecord {
      */
     public static function createRecord(string $loggerName,
                                         int $logLevel,
+                                        string $namespace,
                                         string $logMessage,
                                         LogRecordTrace $trace,
                                         array $context=null,
@@ -66,6 +71,7 @@ class LogRecord {
             new DateTime(),
             $loggerName,
             $logLevel,
+            $namespace,
             $logMessage,
             round(memory_get_usage(false) / 1024),
             round(memory_get_usage(true) / 1024),
@@ -106,6 +112,13 @@ class LogRecord {
     public function getLogLevelName(): string
     {
         return Logger::$levels[$this->logLevel];
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamespace() : string {
+        return $this->namespace;
     }
 
     /**
@@ -160,6 +173,7 @@ class LogRecord {
             'Level' 			                    => $this->getLogLevel(),
             'LevelName'     	                    => $this->getLogLevelName(),
             'LoggerName' 		                    => $this->getLoggerName(),
+            'Namespace'                             => $this->getNamespace(),
             'MemUsed'			                    => $this->getMemUsed(),
             'MemAllocated'		                    => $this->getMemAllocated(),
             'Message' 			                    => $this->getLogMessage(),

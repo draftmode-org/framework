@@ -35,6 +35,7 @@
   "autoload": {
     "psr-4": {
       "Terrazza\\Framework\\" : "src",
+      "Terrazza\\Kernel\\" : "plugin/terrazza/kernel/src",
       "Terrazza\\Routing\\" : "plugin/terrazza/routing/src",
       "Terrazza\\Http\\Routing\\" : "plugin/terrazza/http-routing/src",
       "Terrazza\\Http\\Routing\\OpenApi\\" : "plugin/terrazza/http-routing-open-api/src",

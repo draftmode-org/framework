@@ -3,6 +3,7 @@
 namespace Terrazza\Injector;
 
 use Closure;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
@@ -45,8 +46,11 @@ class Injector implements InjectorInterface {
     public function __construct($classMapping, LoggerInterface $logger) {
         $this->classMapping                         = $classMapping;
         $this->logger                               = $logger;
-        // push yourself into containerCache
+
+        // push injector with InjectorInterface, ContainerInterface into containerCache
         $this->push(InjectorInterface::class, $this);
+        $this->push(ContainerInterface::class, $this);
+
         // push logger into containerCache
         $this->push(LoggerInterface::class, $logger);
     }
@@ -60,7 +64,7 @@ class Injector implements InjectorInterface {
     public function get($id, array $arguments=null) : object {
         $runtime_start                              = microtime(true);
         if (array_key_exists($id, $this->containerCache)) {
-            $this->logger->debug("$id from containerCache", ["line" => __LINE__, "method" => __METHOD__]);
+            $this->logger->debug("$id from containerCache");
             $this->runtime                          = microtime(true) - $runtime_start;
             return $this->containerCache[$id];
         } else {
@@ -122,11 +126,12 @@ class Injector implements InjectorInterface {
     }
 
     private function push(string $className, $argument) : void {
+        $this->logger->debug("push to containerInterface: $className");
         $this->containerCache[$className]           = $argument;
     }
 
     private function instantiate(string $className, array $arguments=null): object {
-        $this->logger->debug($className . ($arguments ? " with arguments" : " without arguments"), ["line" => __LINE__, "method" => __METHOD__, "arguments" => $arguments]);
+        $this->logger->debug($className);
         $additionalContext                          = $arguments ?? [];
         $currentClassName                           = $className;
         try {
@@ -134,7 +139,7 @@ class Injector implements InjectorInterface {
                 $redo                               = false;
                 $mappingInfo                        = $this->getMapping($currentClassName);
                 if (is_callable($mappingInfo)) {
-                    $this->logger->debug(".mappingInfo.isCallable", ["line" => __LINE__, "method" => __METHOD__]);
+                    $this->logger->debug(".mappingInfo.isCallable");
                     return $mappingInfo(... $this->getMethodArgs(
                         new ReflectionFunction(Closure::fromCallable($mappingInfo)), [
                             'className'             => $currentClassName,
@@ -142,7 +147,7 @@ class Injector implements InjectorInterface {
                     ));
                 }
                 elseif (is_array($mappingInfo)) {
-                    $this->logger->debug(".mappingInfo.isArray", ["line" => __LINE__, "method" => __METHOD__]);
+                    $this->logger->debug(".mappingInfo.isArray");
                     if (is_array($arguments) && count($arguments)) {
                         $additionalContext          = array_filter($mappingInfo + $arguments);
                     } else {
@@ -150,7 +155,7 @@ class Injector implements InjectorInterface {
                     }
                 }
                 elseif (is_string($mappingInfo)) {
-                    $this->logger->debug(".mappingInfo.isString:$mappingInfo", ["line" => __LINE__, "method" => __METHOD__]);
+                    $this->logger->debug(".mappingInfo.isString:$mappingInfo");
                     $currentClassName               = $mappingInfo;
                     $redo                           = true;
                 }
@@ -161,7 +166,6 @@ class Injector implements InjectorInterface {
                 throw new InjectorException("hallo:".$currentClassName);
             }*/
             if (class_exists($currentClassName)) {
-                $this->logger->debug("$currentClassName class exists", ["line" => __LINE__, "method" => __METHOD__]);
                 $classInfo                          = new ReflectionClass($currentClassName);
                 if ($classInfo->isInterface()) {
                     throw new InjectorException("Injector->instantiate(): interface $className cannot be instantiated");
@@ -169,6 +173,7 @@ class Injector implements InjectorInterface {
                 if ($classInfo->isAbstract()) {
                     throw new InjectorException("Injector->instantiate(): abstract class $className cannot be instantiated");
                 }
+                $this->logger->debug("loadClass $currentClassName by ReflectionClass");
                 return $classInfo->newInstanceArgs($this->getClassArgs($classInfo, $additionalContext));
             }
         } catch (ReflectionException $ex) {
@@ -182,13 +187,12 @@ class Injector implements InjectorInterface {
      * @return string|callable|array|null
      */
     private function getMapping(string $mappingKey) {
-        $this->logger->debug("get mapping for $mappingKey", ["line" => __LINE__, "method" => __METHOD__]);
         $mapping                                    = $this->loadMapping();
         if (array_key_exists($mappingKey, $mapping)) {
-            $this->logger->debug("mappingKey found by loadMapping", ["line" => __LINE__, "method" => __METHOD__]);
+            $this->logger->debug("mappingKey $mappingKey found by loadMapping");
             return $mapping[$mappingKey];
         } else {
-            $this->logger->debug("mappingKey not found by loadMapping", ["line" => __LINE__, "method" => __METHOD__]);
+            $this->logger->debug("mappingKey $mappingKey not found by loadMapping");
             return null;
         }
     }
@@ -199,30 +203,28 @@ class Injector implements InjectorInterface {
      */
     private function loadMapping() : array {
         if (is_null($this->mapping)) {
-            $this->logger->debug("initialize new mapping", ["line" => __LINE__, "method" => __METHOD__]);
             try {
                 if (is_array($this->classMapping)) {
-                    $this->logger->debug("classMapping is array, provide it as mapping", ["line" => __LINE__, "method" => __METHOD__]);
+                    $this->logger->debug("loadMapping from array");
                     $this->mapping                  = $this->classMapping;
                 }
                 elseif (is_string($this->classMapping)) {
                     if (file_exists($this->classMapping)) {
-                        $this->logger->debug("require classMapping, ".$this->classMapping, ["line" => __LINE__, "method" => __METHOD__]);
+                        $this->logger->debug("require classMapping, ".$this->classMapping);
                         $mapping                    = require_once($this->classMapping);
                         $this->mapping              = $mapping;
+                        $this->logger->debug("loadMapping from file");
                     } else {
                         throw new InjectorException("loadMapping file " . $this->classMapping . " not found/does not exists");
                     }
                 } else {
-                    throw new InjectorException("loadMapping classMapping expected string (file), array (mapping), given ".gettype($this->classMapping));
+                    throw new InjectorException("loadMapping expected string (file), array (mapping), given ".gettype($this->classMapping));
                 }
             } catch (InjectorException $exception) {
                 throw $exception;
             } catch (Throwable $exception) {
                 throw new InjectorException("loadMapping could not be loaded", $exception->getCode(), $exception);
             }
-        } else {
-            $this->logger->debug("mapping already initialzed", ["line" => __LINE__, "method" => __METHOD__]);
         }
         return $this->mapping;
     }
@@ -233,14 +235,11 @@ class Injector implements InjectorInterface {
      * @return array
      */
     private function getMethodArgs(ReflectionFunctionAbstract $method, array $extraMapping=null): array {
-        $this->logger->debug("", ["line" => __LINE__, "method" => __METHOD__, "arguments" => $extraMapping]);
         $args                                       = [];
         foreach($method->getParameters() as $parameter) {
             $paramKey                               = $parameter->getName();
-            $this->logger->debug("getArg $paramKey", ["line" => __LINE__, "method" => __METHOD__]);
             $this->pushTraceKey($paramKey);
             if ($extraMapping && array_key_exists($paramKey, $extraMapping)) {
-                $this->logger->debug(".use from extraMapping", ["line" => __LINE__, "method" => __METHOD__]);
                 $result                             = $extraMapping[$paramKey];
             } else {
                 $type                               = $parameter->getType();
@@ -256,7 +255,7 @@ class Injector implements InjectorInterface {
                     if ($parameter->isDefaultValueAvailable()) {
                         $result                    = $parameter->getDefaultValue();
                     } else {
-                        throw new InjectorException("parameter ".$this->getTraceKeys()." missing");
+                        throw new InjectorException("method:parameter ".$this->getTraceKeys()." missing");
                     }
                 }
             }
@@ -277,7 +276,6 @@ class Injector implements InjectorInterface {
             return $this->getMethodArgs($constructor, $extraMapping);
         }
         else {
-            $this->logger->debug("class ".$class->getName()." has no constructor", ["line" => __LINE__, "method" => __METHOD__]);
             return [];
         }
     }

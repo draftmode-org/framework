@@ -1,18 +1,8 @@
 <?php
 namespace Terrazza\Http\Request;
-use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\RequestInterface;
 
-interface HttpRequestInterface {
-    /**
-     * @return UriInterface
-     */
-    public function getUri() : UriInterface;
-
-    /**
-     * @return string
-     */
-    public function getMethod() : string;
-
+interface HttpRequestInterface extends RequestInterface {
     /**
      * @return string|null
      */

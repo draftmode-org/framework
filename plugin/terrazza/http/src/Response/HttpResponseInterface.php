@@ -1,4 +1,5 @@
 <?php
 namespace Terrazza\Http\Response;
+use Psr\Http\Message\ResponseInterface;
 
-interface HttpResponseInterface {}
+interface HttpResponseInterface extends ResponseInterface {}

@@ -1,7 +1,9 @@
 <?php
 namespace Terrazza\Http\Routing\OpenApi;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Terrazza\Http\Request\HttpRequestHandlerInterface;
 use Terrazza\Http\Request\HttpRequestInterface;
@@ -21,14 +23,19 @@ class OpenApiRouter implements HttpRouterInterface {
     /**
      * @param HttpRequestInterface $request
      * @return HttpRequestHandlerInterface|null
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     function getRequestHandler(HttpRequestInterface $request): ?HttpRequestHandlerInterface {
-        if ($route = $this->routing->getRoute($request->getUri(), $request->getMethod(), $request->getContentType())) {
-            $this->logger->info("routing for uri: ".$request->getUri()." / method: ".$request->getMethod()." found");
+        $requestMethod                              = strtolower($request->getMethod());
+        $requestPath                                = $request->getUri()->getPath();
+        $requestContentType                         = $request->getContentType();
+        if ($route = $this->routing->getRoute($requestPath, $requestMethod, $requestContentType)) {
+            $this->logger->info("routing for path: $requestPath / method: $requestMethod found");
             $controllerClass						= $this->injector->get($route->getOperationId());
             return new $controllerClass;
         } else {
-            $this->logger->info("routing for uri: ".$request->getUri()." / method: ".$request->getMethod()." not found");
+            $this->logger->info("routing for path: $requestPath / method: $requestMethod found");
             return null;
         }
     }

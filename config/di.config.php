@@ -1,7 +1,9 @@
 <?php
 
 use Psr\Container\ContainerInterface;
+use Terrazza\Http\Routing\HttpRouterInterface;
 use Terrazza\Http\Routing\HttpRoutingInterface;
+use Terrazza\Http\Routing\OpenApi\OpenApiRouter;
 use Terrazza\Http\Routing\OpenApi\OpenApiRouting;
 use Terrazza\Http\Routing\OpenApi\OpenApiYaml;
 use Terrazza\Injector\Injector;
@@ -15,6 +17,7 @@ return [
 
     RouteMatcherInterface::class                    => RouteMatcher::class,
     RouteConfigInterface::class                     => OpenApiYaml::class,
+    HttpRouterInterface::class                      => OpenApiRouter::class,
     HttpRoutingInterface::class                     => OpenApiRouting::class,
     OpenApiYaml::class                              => ["yamlFilename" => "../api.yaml"]
 ];

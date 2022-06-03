@@ -1,5 +1,5 @@
 <?php
-namespace Terrazza\Framework\Helper;
+namespace Terrazza\Kernel\Helper;
 
 use Terrazza\Logger\Handler\ChannelHandler;
 use Terrazza\Logger\Handler\LogHandler;
@@ -21,7 +21,7 @@ class LoggerHelper {
     public function createLogger($stream=null) : LoggerInterface {
         $logger                                     = new rLogger($this->name);
         $format                                     = [
-            "message" => "{Date} {Namespace}:{Method} (#{Line}) {Message} {Context}"
+            "message" => "{Date} {Trace.Method} (#{Trace.Line}) {Message} {Context}"
         ];
         if ($stream === true) {
             $stream                                 = "php://stdout";

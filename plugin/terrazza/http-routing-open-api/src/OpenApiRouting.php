@@ -25,39 +25,39 @@ class OpenApiRouting implements HttpRoutingInterface {
     }
 
     /**
-     * @param string $requestUri
+     * @param string $requestPath
      * @return string|null
      */
-    public function getMatchedUri(string $requestUri) :?string {
+    public function getMatchedUri(string $requestPath) :?string {
         if ($paths = $this->config->getPaths()) {
-            return $this->matcher->getRoutesMatchedUri($paths, $requestUri);
+            return $this->matcher->getRoutesMatchedUri($paths, $requestPath);
         } else {
             return null;
         }
     }
 
     /**
-     * @param string $requestUri
+     * @param string $requestPath
      * @param string $requestMethod
      * @param string|null $requestContentType
      * @return HttpRoute|null
      */
-    public function getRoute(string $requestUri, string $requestMethod, ?string $requestContentType=null) :?HttpRoute {
-        if ($uri = $this->getMatchedUri($requestUri)) {
-            if ($path = $this->config->getPath($uri, $requestMethod)) {
+    public function getRoute(string $requestPath, string $requestMethod, ?string $requestContentType=null) :?HttpRoute {
+        if ($routingPath = $this->getMatchedUri($requestPath)) {
+            if ($this->config->getPath($routingPath, $requestMethod)) {
 
                 // get contentTypes vai api.yaml requestBody
-                if ($expectedContentTypes = $this->config->getContentTypes($uri, $requestMethod)) {
+                if ($expectedContentTypes = $this->config->getContentTypes($routingPath, $requestMethod)) {
 
                     // match contentTypes from yaml against requestContentType
                     if ($this->contentTypeMatches($expectedContentTypes, $requestContentType)) {
-                        return new HttpRoute($uri, $requestMethod, HttpPaymentGetController::class);
+                        return new HttpRoute($routingPath, $requestMethod, HttpPaymentGetController::class);
                     } else {
                         var_dump("content type failure", $expectedContentTypes);
                     }
                 } else {
                     // no contentTypes expected
-                    return new HttpRoute($uri, $requestMethod, HttpPaymentGetController::class);
+                    return new HttpRoute($routingPath, $requestMethod, HttpPaymentGetController::class);
                 }
             } else {
                 var_dump("uri found, method not found");
