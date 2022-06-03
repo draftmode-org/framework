@@ -16,7 +16,7 @@ class HttpKernel {
     }
 
     public function handle() {
-        $logger                                     = (new LoggerHelper("framework"))->createLogger("log.txt");
+        $logger                                     = (new LoggerHelper("framework"))->createLogger("../logger.log");
         try {
             $injector                               = new Injector(require_once("../config/di.config.php"), $logger);
 

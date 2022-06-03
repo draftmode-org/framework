@@ -1,6 +1,5 @@
 <?php
 
-use Psr\Container\ContainerInterface;
 use Terrazza\Http\Routing\HttpRouterInterface;
 use Terrazza\Http\Routing\HttpRoutingInterface;
 use Terrazza\Http\Routing\OpenApi\OpenApiRouter;
@@ -13,7 +12,7 @@ use Terrazza\Routing\RouteMatcher;
 use Terrazza\Routing\RouteMatcherInterface;
 
 return [
-    ContainerInterface::class                       => Injector::class,
+    InjectorInterface::class                       => Injector::class,
 
     RouteMatcherInterface::class                    => RouteMatcher::class,
     RouteConfigInterface::class                     => OpenApiYaml::class,

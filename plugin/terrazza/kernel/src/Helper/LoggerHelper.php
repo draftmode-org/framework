@@ -31,7 +31,7 @@ class LoggerHelper {
             $formatter->pushConverter("Date", new LogRecordValueDateConverter());
             $formatter->pushConverter("Content.exception", new LogRecordValueExceptionConverter());
             $writer                                 = new LogStreamFileWriter(new FormattedRecordFlatConverter(" "), $stream, FILE_APPEND);
-            @file_put_contents($stream, PHP_EOL);
+            @unlink($stream);
             $channelHandler                           = new ChannelHandler($writer, $formatter, null, new LogHandler(rLogger::DEBUG));
             return $logger->registerChannelHandler($channelHandler);
         } elseif ($stream === false) {

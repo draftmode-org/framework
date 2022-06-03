@@ -4,13 +4,13 @@ namespace Terrazza\Injector;
 
 use Closure;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use Terrazza\Injector\Exception\InjectorException;
+use Terrazza\Logger\LoggerInterface;
 use Throwable;
 
 class Injector implements InjectorInterface {
@@ -45,11 +45,10 @@ class Injector implements InjectorInterface {
      */
     public function __construct($classMapping, LoggerInterface $logger) {
         $this->classMapping                         = $classMapping;
-        $this->logger                               = $logger;
+        $this->logger                               = $logger->withNamespace(__NAMESPACE__);
 
-        // push injector with InjectorInterface, ContainerInterface into containerCache
+        // push injector with InjectorInterface into containerCache
         $this->push(InjectorInterface::class, $this);
-        $this->push(ContainerInterface::class, $this);
 
         // push logger into containerCache
         $this->push(LoggerInterface::class, $logger);

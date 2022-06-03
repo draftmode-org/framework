@@ -1,18 +1,18 @@
 <?php
 namespace Terrazza\Http\Routing\OpenApi\Request;
 
-use Psr\Log\LoggerInterface;
 use Terrazza\Http\Request\HttpRequestInterface;
 use Terrazza\Http\Routing\HttpRequestValidatorInterface;
 use Terrazza\Http\Routing\HttpRoute;
 use Terrazza\Http\Routing\HttpRoutingInterface;
+use Terrazza\Logger\LoggerInterface;
 
 class OpenApiRequestValidator implements HttpRequestValidatorInterface {
     private HttpRoutingInterface $routing;
     private LoggerInterface $logger;
     public function __construct(HttpRoutingInterface $routing, LoggerInterface $logger) {
         $this->routing                              = $routing;
-        $this->logger                               = $logger;
+        $this->logger                               = $logger->withNamespace(__NAMESPACE__);
     }
 
     /**

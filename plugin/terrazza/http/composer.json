@@ -1,8 +1,8 @@
 {
-    "name": "terrazza/http-routing-open-api",
+    "name": "terrazza/http",
     "type" : "library",
     "version": "2.0.0",
-    "description": "http routing for open api",
+    "description": "http",
     "license": "MIT",
     "config" : {
         "vendor-dir" : "plugin"
@@ -15,14 +15,14 @@
     ],
     "require": {
         "php": ">=7.4",
-
-        "terrazza/http-routing": "2.*",
-        "terrazza/injector": "2.*",
-        "terrazza/logger": "2.*"
+        "psr/http-message": "1.*",
+        "psr/http-client": "1.*",
+        "psr/http-factory": "1.*",
+        "psr/http-server-handler": "1.*"
     },
     "autoload": {
         "psr-4": {
-            "Terrazza\\Http\\Routing" : "src"
+            "Terrazza\\Http" : "src"
         }
     },
     "minimum-stability": "dev"
