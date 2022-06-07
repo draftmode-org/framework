@@ -1,12 +1,11 @@
 <?php
 namespace Terrazza\Http\Routing;
-use Terrazza\Routing\RouteConfigInterface;
 
 interface HttpRoutingInterface {
     /**
-     * @return RouteConfigInterface
+     * @return HttpRouteLoaderInterface
      */
-    public function getConfig() : RouteConfigInterface;
+    public function getLoader() : HttpRouteLoaderInterface;
 
     /**
      * @param string $requestPath

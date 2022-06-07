@@ -21,7 +21,7 @@ class LoggerHelper {
     public function createLogger($stream=null) : LoggerInterface {
         $logger                                     = new rLogger($this->name);
         $format                                     = [
-            "message" => "{Date} {Trace.Method} (#{Trace.Line}) {Message} {Context}"
+            "message" => "{Date} [{LevelName}] {Trace.Method} (#{Trace.Line}) {Message} {Context}"
         ];
         if ($stream === true) {
             $stream                                 = "php://stdout";

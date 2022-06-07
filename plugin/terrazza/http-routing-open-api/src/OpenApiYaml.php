@@ -2,13 +2,14 @@
 namespace Terrazza\Http\Routing\OpenApi;
 
 use RuntimeException;
-use Terrazza\Routing\RouteConfigInterface;
+use Terrazza\Http\Routing\HttpRouteLoaderInterface;
 
-class OpenApiYaml implements RouteConfigInterface {
+class OpenApiYaml implements HttpRouteLoaderInterface {
     private string $yamlFilename;
     private ?array $content                         = null;
     CONST REF_NODE                                  = "\$ref";
     CONST REQUEST_BODY_NODE                         = "requestBody";
+    CONST REQUEST_HANDLER_CLASS_NODE                = "operationId";
     CONST SKIP_METHODS								= ["parameters"];
     CONST MULTIPLE_TYPES                            = ["oneOf"];
 
@@ -55,6 +56,25 @@ class OpenApiYaml implements RouteConfigInterface {
             return $content;
         } else {
             return [];
+        }
+    }
+
+    /**
+     * @param string $uri
+     * @param string $method
+     * @param string|null $contentType
+     * @return string
+     * @throw RuntimeException
+     */
+    public function getRequestHandlerClass(string $uri, string $method, ?string $contentType=null) : string {
+        if ($path = $this->getPath($uri, $method)) {
+            $requestHandlerClass                    = $path[self::REQUEST_HANDLER_CLASS_NODE] ?? null;
+            if ($requestHandlerClass) {
+                return $requestHandlerClass;
+            }
+            throw new RuntimeException("node ".self::REQUEST_HANDLER_CLASS_NODE." for paths/$uri:$method not found");
+        } else {
+            throw new RuntimeException("uri $uri, method $method not found");
         }
     }
 

@@ -3,8 +3,8 @@ namespace Terrazza\Http\Request;
 use Generator;
 use Terrazza\Http\Response\HttpResponseInterface;
 
-class HttpRequestMiddleware implements HttpRequestMiddlewareInterface {
-    /** @var HttpRequestMiddlewareInterface[]  */
+class HttpRequestMiddlewareHandler implements HttpRequestMiddlewareHandlerInterface {
+    /** @var HttpRequestMiddlewareHandlerInterface[]  */
     private array $middlewares;
     public function __construct(...$middlewares) {
         $this->middlewares = $middlewares;
@@ -38,7 +38,7 @@ class HttpRequestMiddleware implements HttpRequestMiddlewareInterface {
                 if (!$this->generator->valid()) {
                     return $this->requestHandler->handle($request);
                 }
-                /** @var HttpRequestMiddlewareInterface $current */
+                /** @var HttpRequestMiddlewareHandlerInterface $current */
                 $current                            = $this->generator->current();
                 $this->generator->next();
                 return $current->handle($request, $this);

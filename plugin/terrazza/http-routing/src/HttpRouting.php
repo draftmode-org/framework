@@ -1,27 +1,25 @@
 <?php
-namespace Terrazza\Http\Routing\OpenApi;
+namespace Terrazza\Http\Routing;
 
-use Terrazza\Http\Routing\HttpRoute;
-use Terrazza\Http\Routing\HttpRoutingInterface;
-use Terrazza\Routing\RouteConfigInterface;
+use Terrazza\Http\Routing\Exception\HttpMethodNotAllowedException;
+use Terrazza\Http\Routing\Exception\HttpRouteNotFoundException;
+use Terrazza\Http\Routing\Exception\HttpUnsupportedContentType;
 use Terrazza\Routing\RouteMatcherInterface;
 
-use Terrazza\Framework\Controller\Http\HttpPaymentGetController;
-
-class OpenApiRouting implements HttpRoutingInterface {
-    private RouteConfigInterface $config;
+class HttpRouting implements HttpRoutingInterface {
+    private HttpRouteLoaderInterface $loader;
     private RouteMatcherInterface $matcher;
 
-    public function __construct(RouteMatcherInterface $matcher, RouteConfigInterface $config) {
-        $this->config 								= $config;
+    public function __construct(RouteMatcherInterface $matcher, HttpRouteLoaderInterface $loader) {
+        $this->loader 								= $loader;
         $this->matcher 								= $matcher;
     }
 
     /**
-     * @return RouteConfigInterface
+     * @return HttpRouteLoaderInterface
      */
-    public function getConfig() : RouteConfigInterface {
-        return $this->config;
+    public function getLoader() : HttpRouteLoaderInterface {
+        return $this->loader;
     }
 
     /**
@@ -29,7 +27,7 @@ class OpenApiRouting implements HttpRoutingInterface {
      * @return string|null
      */
     public function getMatchedUri(string $requestPath) :?string {
-        if ($paths = $this->config->getPaths()) {
+        if ($paths = $this->loader->getPaths()) {
             return $this->matcher->getRoutesMatchedUri($paths, $requestPath);
         } else {
             return null;
@@ -41,31 +39,34 @@ class OpenApiRouting implements HttpRoutingInterface {
      * @param string $requestMethod
      * @param string|null $requestContentType
      * @return HttpRoute|null
+     * @throws HttpUnsupportedContentType
+     * @throws HttpMethodNotAllowedException
+     * @throws HttpRouteNotFoundException
      */
     public function getRoute(string $requestPath, string $requestMethod, ?string $requestContentType=null) :?HttpRoute {
-        if ($routingPath = $this->getMatchedUri($requestPath)) {
-            if ($this->config->getPath($routingPath, $requestMethod)) {
-
+        if ($encodedPath = $this->getMatchedUri($requestPath)) {
+            if ($this->loader->getPath($encodedPath, $requestMethod)) {
                 // get contentTypes vai api.yaml requestBody
-                if ($expectedContentTypes = $this->config->getContentTypes($routingPath, $requestMethod)) {
+                if ($expectedContentTypes = $this->loader->getContentTypes($encodedPath, $requestMethod)) {
 
                     // match contentTypes from yaml against requestContentType
                     if ($this->contentTypeMatches($expectedContentTypes, $requestContentType)) {
-                        return new HttpRoute($routingPath, $requestMethod, HttpPaymentGetController::class);
+                        $requestHandlerClass        = $this->loader->getRequestHandlerClass($encodedPath, $requestMethod, $requestContentType);
+                        return new HttpRoute($encodedPath, $requestMethod, $requestHandlerClass);
                     } else {
-                        var_dump("content type failure", $expectedContentTypes);
+                        throw new HttpUnsupportedContentType($requestContentType);
                     }
                 } else {
                     // no contentTypes expected
-                    return new HttpRoute($routingPath, $requestMethod, HttpPaymentGetController::class);
+                    $requestHandlerClass        = $this->loader->getRequestHandlerClass($encodedPath, $requestMethod, $requestContentType);
+                    return new HttpRoute($encodedPath, $requestMethod, $requestHandlerClass);
                 }
             } else {
-                var_dump("uri found, method not found");
+                throw new HttpMethodNotAllowedException($requestMethod);
             }
         } else {
-            var_dump("uri not found");
+            throw new HttpRouteNotFoundException($requestPath);
         }
-        return null;
     }
 
     /**

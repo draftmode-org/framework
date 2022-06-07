@@ -1,0 +1,3 @@
+<?php
+namespace Terrazza\Http\Request;
+class HttpServerRequestMiddlewareHandler extends HttpRequestMiddlewareHandler implements HttpServerRequestHandlerInterface {}

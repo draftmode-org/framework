@@ -3,11 +3,11 @@ namespace Terrazza\Http\Routing\OpenApi\Request;
 
 use Terrazza\Http\Request\HttpRequestHandlerInterface;
 use Terrazza\Http\Request\HttpRequestInterface;
-use Terrazza\Http\Request\HttpRequestMiddlewareInterface;
+use Terrazza\Http\Request\HttpRequestMiddlewareHandlerInterface;
 use Terrazza\Http\Response\HttpResponseInterface;
 use Terrazza\Http\Routing\HttpRequestValidatorInterface;
 
-class OpenApiRequestValidatorMiddleware implements HttpRequestMiddlewareInterface {
+class HttpRequestValidatorMiddlewareHandler implements HttpRequestMiddlewareHandlerInterface {
     private HttpRequestValidatorInterface $validator;
     public function __construct(HttpRequestValidatorInterface $validator) {
         $this->validator                            = $validator;

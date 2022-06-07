@@ -7,7 +7,7 @@ use Terrazza\Http\Routing\HttpRoute;
 use Terrazza\Http\Routing\HttpRoutingInterface;
 use Terrazza\Logger\LoggerInterface;
 
-class OpenApiRequestValidator implements HttpRequestValidatorInterface {
+class HttpRequestValidator implements HttpRequestValidatorInterface {
     private HttpRoutingInterface $routing;
     private LoggerInterface $logger;
     public function __construct(HttpRoutingInterface $routing, LoggerInterface $logger) {

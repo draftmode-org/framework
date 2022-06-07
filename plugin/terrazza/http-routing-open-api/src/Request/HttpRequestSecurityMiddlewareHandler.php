@@ -3,11 +3,11 @@ namespace Terrazza\Http\Routing\OpenApi\Request;
 
 use Terrazza\Http\Request\HttpRequestHandlerInterface;
 use Terrazza\Http\Request\HttpRequestInterface;
-use Terrazza\Http\Request\HttpRequestMiddlewareInterface;
+use Terrazza\Http\Request\HttpRequestMiddlewareHandlerInterface;
 use Terrazza\Http\Response\HttpResponseInterface;
 use Terrazza\Http\Routing\HttpRequestSecurityInterface;
 
-class OpenApiRequestSecurityMiddleware implements HttpRequestMiddlewareInterface {
+class HttpRequestSecurityMiddlewareHandler implements HttpRequestMiddlewareHandlerInterface {
     private HttpRequestSecurityInterface $security;
     public function __construct(HttpRequestSecurityInterface $security) {
         $this->security 						    = $security;
