@@ -1,6 +1,10 @@
 <?php
 namespace Terrazza\Http\Routing;
 
+use Terrazza\Http\Routing\Exception\HttpMethodNotAllowedException;
+use Terrazza\Http\Routing\Exception\HttpUnsupportedContentType;
+use Terrazza\Http\Routing\Exception\HttpUriNotFoundException;
+
 interface HttpRoutingInterface {
     /**
      * @return HttpRouteLoaderInterface
@@ -17,7 +21,10 @@ interface HttpRoutingInterface {
      * @param string $requestPath
      * @param string $requestMethod
      * @param string|null $requestContentType
-     * @return HttpRoute|null
+     * @return HttpRoute
+     * @throws HttpUnsupportedContentType
+     * @throws HttpMethodNotAllowedException
+     * @throws HttpUriNotFoundException
      */
-    public function getRoute(string $requestPath, string $requestMethod, ?string $requestContentType=null) :?HttpRoute;
+    public function getRoute(string $requestPath, string $requestMethod, ?string $requestContentType=null) : HttpRoute;
 }

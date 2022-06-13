@@ -1,9 +1,8 @@
 <?php
 namespace Terrazza\Http\Request;
-
 use Terrazza\Http\Response\HttpResponseInterface;
 
-interface HttpServerRequestHandlerInterface extends HttpRequestMiddlewareHandlerInterface {
+interface HttpServerRequestHandlerInterface {
     /**
      * @param HttpServerRequestInterface $request
      * @param HttpRequestHandlerInterface $requestHandler

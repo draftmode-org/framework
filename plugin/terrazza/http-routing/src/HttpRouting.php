@@ -2,17 +2,20 @@
 namespace Terrazza\Http\Routing;
 
 use Terrazza\Http\Routing\Exception\HttpMethodNotAllowedException;
-use Terrazza\Http\Routing\Exception\HttpRouteNotFoundException;
 use Terrazza\Http\Routing\Exception\HttpUnsupportedContentType;
+use Terrazza\Http\Routing\Exception\HttpUriNotFoundException;
+use Terrazza\Logger\LoggerInterface;
 use Terrazza\Routing\RouteMatcherInterface;
 
 class HttpRouting implements HttpRoutingInterface {
     private HttpRouteLoaderInterface $loader;
     private RouteMatcherInterface $matcher;
+    private LoggerInterface $logger;
 
-    public function __construct(RouteMatcherInterface $matcher, HttpRouteLoaderInterface $loader) {
+    public function __construct(RouteMatcherInterface $matcher, HttpRouteLoaderInterface $loader, LoggerInterface $logger) {
         $this->loader 								= $loader;
         $this->matcher 								= $matcher;
+        $this->logger                               = $logger->withNamespace(__NAMESPACE__);
     }
 
     /**
@@ -28,8 +31,10 @@ class HttpRouting implements HttpRoutingInterface {
      */
     public function getMatchedUri(string $requestPath) :?string {
         if ($paths = $this->loader->getPaths()) {
+            $this->logger->debug("loader path count: ".count($paths));
             return $this->matcher->getRoutesMatchedUri($paths, $requestPath);
         } else {
+            $this->logger->debug("no loader paths found");
             return null;
         }
     }
@@ -38,34 +43,39 @@ class HttpRouting implements HttpRoutingInterface {
      * @param string $requestPath
      * @param string $requestMethod
      * @param string|null $requestContentType
-     * @return HttpRoute|null
+     * @return HttpRoute
      * @throws HttpUnsupportedContentType
      * @throws HttpMethodNotAllowedException
-     * @throws HttpRouteNotFoundException
+     * @throws HttpUriNotFoundException
      */
-    public function getRoute(string $requestPath, string $requestMethod, ?string $requestContentType=null) :?HttpRoute {
+    public function getRoute(string $requestPath, string $requestMethod, ?string $requestContentType=null) : HttpRoute {
         if ($encodedPath = $this->getMatchedUri($requestPath)) {
             if ($this->loader->getPath($encodedPath, $requestMethod)) {
-                // get contentTypes vai api.yaml requestBody
+                // get contentTypes (optional)
                 if ($expectedContentTypes = $this->loader->getContentTypes($encodedPath, $requestMethod)) {
-
+                    $this->logger->debug("expected content-types for uri/method provided");
                     // match contentTypes from yaml against requestContentType
                     if ($this->contentTypeMatches($expectedContentTypes, $requestContentType)) {
+                        $this->logger->debug("content-type matched expected ones");
                         $requestHandlerClass        = $this->loader->getRequestHandlerClass($encodedPath, $requestMethod, $requestContentType);
                         return new HttpRoute($encodedPath, $requestMethod, $requestHandlerClass);
                     } else {
+                        $this->logger->debug("content-type not accepted, given ".$requestContentType);
                         throw new HttpUnsupportedContentType($requestContentType);
                     }
                 } else {
+                    $this->logger->debug("content-type for uri/method not restricted");
                     // no contentTypes expected
                     $requestHandlerClass        = $this->loader->getRequestHandlerClass($encodedPath, $requestMethod, $requestContentType);
                     return new HttpRoute($encodedPath, $requestMethod, $requestHandlerClass);
                 }
             } else {
+                $this->logger->debug("method $requestMethod for uri $requestPath not found");
                 throw new HttpMethodNotAllowedException($requestMethod);
             }
         } else {
-            throw new HttpRouteNotFoundException($requestPath);
+            $this->logger->debug("uri $requestPath not found in given paths");
+            throw new HttpUriNotFoundException($requestPath);
         }
     }
 

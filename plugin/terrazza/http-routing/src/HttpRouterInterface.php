@@ -1,13 +1,11 @@
 <?php
 namespace Terrazza\Http\Routing;
-
-use Terrazza\Http\Request\HttpRequestHandlerInterface;
 use Terrazza\Http\Request\HttpRequestInterface;
 
 interface HttpRouterInterface {
     /**
      * @param HttpRequestInterface $request
-     * @return HttpRequestHandlerInterface|null
+     * @return HttpRoute|null
      */
-    function getRequestHandler(HttpRequestInterface $request) :?HttpRequestHandlerInterface;
+    function getRoute(HttpRequestInterface $request) :?HttpRoute;
 }

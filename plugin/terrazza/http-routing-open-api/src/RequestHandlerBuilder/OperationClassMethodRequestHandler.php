@@ -3,32 +3,52 @@ namespace Terrazza\Http\Routing\OpenApi\RequestHandlerBuilder;
 use ReflectionClass;
 use Terrazza\Http\Request\HttpRequestHandlerInterface;
 use Terrazza\Http\Request\HttpRequestInterface;
-use Terrazza\Http\Response\HttpResponse;
 use Terrazza\Http\Response\HttpResponseInterface;
+use Terrazza\Http\Routing\Exception\HttpRoutingControllerException;
 use Terrazza\Http\Routing\HttpRequestHandlerBuilderInterface;
 use Terrazza\Http\Routing\HttpRoute;
 use Terrazza\Injector\InjectorInterface;
+use Throwable;
 
 class OperationClassMethodRequestHandler implements HttpRequestHandlerBuilderInterface {
     private InjectorInterface $injector;
     private string $controllerPath;
+    CONST CONTROLLER_PATH_DELIMITER                 = "/";
+    CONST OPERATION_DELIMITER                       = "_";
     public function __construct(InjectorInterface $injector, string $controllerPath) {
         $this->injector                             = $injector;
         $this->controllerPath                       = $controllerPath;
     }
 
-    function getRequestHandler(HttpRoute $route) : HttpRequestHandlerInterface {
-        return new class ($route, $this->injector, $this->controllerPath) implements HttpRequestHandlerInterface {
-            private HttpRoute $route;
-            private InjectorInterface $injector;
-            private string $controllerPath;
-            CONST CONTROLLER_PATH_DELIMITER         = "/";
-            CONST OPERATION_DELIMITER               = "_";
+    /**
+     * @param string $className
+     * @param string $controllerPath
+     * @return object
+     * @throws HttpRoutingControllerException
+     */
+    private function getClass(string $className, string $controllerPath) : object {
+        $className                                  = str_replace("{ClassName}", ucfirst($className), $controllerPath);
+        $className                                  = str_replace(self::CONTROLLER_PATH_DELIMITER, "\\", $className);
+        if (class_exists($className)) {
+            try {
+                return $this->injector->get($className);
+            } catch (Throwable $exception) {
+                throw new HttpRoutingControllerException("controller/class $className could not be initialized", $exception);
+            }
+        } else {
+            throw new HttpRoutingControllerException("controller/class $className does not exist");
+        }
+    }
 
-            public function __construct(HttpRoute $route, InjectorInterface $injector, string $controllerPath) {
-                $this->route                        = $route;
-                $this->injector                     = $injector;
-                $this->controllerPath               = $controllerPath;
+    function getRequestHandler(HttpRoute $route) : HttpRequestHandlerInterface {
+        list($className, $methodName)               = explode(self::OPERATION_DELIMITER, $route->getRequestHandlerClass());
+        $requestHandlerClass                        = $this->getClass($className, $this->controllerPath);
+        return new class ($requestHandlerClass, $methodName) implements HttpRequestHandlerInterface {
+            private object $handleClass;
+            private string $handleMethod;
+            public function __construct(object $handleClass, string $handleMethod) {
+                $this->handleClass                  = $handleClass;
+                $this->handleMethod                 = $handleMethod;
             }
 
             /**
@@ -36,27 +56,10 @@ class OperationClassMethodRequestHandler implements HttpRequestHandlerBuilderInt
              * @return HttpResponseInterface
              */
             public function handle(HttpRequestInterface $request): HttpResponseInterface {
-                list($className, $methodName)       = explode(self::OPERATION_DELIMITER, $this->route->getRequestHandlerClass());
-                $requestHandlerClass                = $this->injectClass($className, $this->controllerPath);
-                if ($this->hasMethod($requestHandlerClass, $methodName)) {
-                    return call_user_func([$requestHandlerClass, $methodName], $request);
+                if ($this->hasMethod($this->handleClass, $this->handleMethod)) {
+                    return call_user_func([$this->handleClass, $this->handleMethod], $request);
                 } else {
-                    return new HttpResponse();
-                }
-            }
-
-            /**
-             * @param string $className
-             * @param string $controllerPath
-             * @return object
-             */
-            private function injectClass(string $className, string $controllerPath) : object {
-                $className                          = str_replace("{ClassName}", ucfirst($className), $controllerPath);
-                $className                          = str_replace(self::CONTROLLER_PATH_DELIMITER, "\\", $className);
-                if (class_exists($className)) {
-                    return $this->injector->get($className);
-                } else {
-                    throw new \RuntimeException($className. "not found");
+                    throw new HttpRoutingControllerException("method ".$this->handleMethod." for controller/class ".get_class($this->handleClass)." does not exist");
                 }
             }
 

@@ -18,10 +18,11 @@ class LoggerHelper {
         $this->name = $name;
     }
 
-    public function createLogger($stream=null) : LoggerInterface {
+    public function createLogger(int $logLevel, $stream=null) : LoggerInterface {
         $logger                                     = new rLogger($this->name);
         $format                                     = [
-            "message" => "{Date} [{LevelName}] {Trace.Method} (#{Trace.Line}) {Message} {Context}"
+            "message"   => "{Date} [{LevelName}] {Trace.Method} (#{Trace.Line}) {Message} {Context}",
+            "exception" => "{Context.exception}"
         ];
         if ($stream === true) {
             $stream                                 = "php://stdout";
@@ -29,10 +30,10 @@ class LoggerHelper {
         if (is_string($stream)) {
             $formatter                              = new LogRecordFormatter(new NonScalarJsonConverter(), $format);
             $formatter->pushConverter("Date", new LogRecordValueDateConverter());
-            $formatter->pushConverter("Content.exception", new LogRecordValueExceptionConverter());
+            $formatter->pushConverter("Context.exception", new LogRecordValueExceptionConverter());
             $writer                                 = new LogStreamFileWriter(new FormattedRecordFlatConverter(" "), $stream, FILE_APPEND);
             @unlink($stream);
-            $channelHandler                           = new ChannelHandler($writer, $formatter, null, new LogHandler(rLogger::DEBUG));
+            $channelHandler                           = new ChannelHandler($writer, $formatter, null, new LogHandler($logLevel));
             return $logger->registerChannelHandler($channelHandler);
         } elseif ($stream === false) {
             return $logger;

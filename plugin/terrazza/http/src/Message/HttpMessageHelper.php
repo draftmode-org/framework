@@ -13,7 +13,6 @@ use Psr\Http\Message\UploadedFileInterface;
  * Trait implementing functionality common to requests and responses.
  */
 trait HttpMessageHelper {
-
     /** @var array<string, string[]> Map of all registered headers, as original name => array of values */
     private array $headers = [];
 

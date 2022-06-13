@@ -82,18 +82,18 @@ class HttpResponse implements HttpResponseInterface {
     /** @var int */
 	private int $statusCode;
 
-	/**
-	 * @param int $status Status code
-	 * @param array $headers Response headers
-	 * @param string|resource|StreamInterface|null $body Response body
-	 * @param string $version Protocol version
-	 * @param string|null $reason Reason phrase (when empty a default will be used based on the status code)
-	 */
+    /**
+     * @param int $status Status code
+     * @param array $headers Response headers
+     * @param string|resource|StreamInterface|null $body Response body
+     * @param string|null $version
+     * @param string|null $reason Reason phrase (when empty a default will be used based on the status code)
+     */
     public function __construct(
         int $status = 200,
         array $headers = [],
         $body = null,
-        string $version = '1.1',
+        string $version = null,
         string $reason = null
     ) {
         $this->assertStatusCodeRange($status);
@@ -119,7 +119,7 @@ class HttpResponse implements HttpResponseInterface {
             $this->reasonPhrase = (string) $reason;
         }
 
-        $this->protocolVersion = $version;
+        $this->protocolVersion = $version ?? $this->protocolVersion;
     }
 
     public function getStatusCode(): int {
