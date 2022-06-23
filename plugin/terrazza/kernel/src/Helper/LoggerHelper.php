@@ -18,12 +18,21 @@ class LoggerHelper {
         $this->name = $name;
     }
 
-    public function createLogger(int $logLevel, $stream=null) : LoggerInterface {
+    public function createLogger(bool $debugMode, $stream=null) : LoggerInterface {
         $logger                                     = new rLogger($this->name);
-        $format                                     = [
-            "message"   => "{Date} [{LevelName}] {Trace.Method} (#{Trace.Line}) {Message} {Context}",
-            "exception" => "{Context.exception}"
-        ];
+        if ($debugMode) {
+            $logLevel                               = rLogger::DEBUG;
+            $format                                 = [
+                "message"   => "{Date} [{LevelName}] {Trace.Method} (#{Trace.Line}) {Message} {Context}",
+                "exception" => "{Context.exception}"
+            ];
+        } else {
+            $logLevel                               = rLogger::INFO;
+            $format                                 = [
+                "message"   => "{Date} [{LevelName}] {Message} {Context}",
+                "exception" => "{Context.exception}"
+            ];
+        }
         if ($stream === true) {
             $stream                                 = "php://stdout";
         }

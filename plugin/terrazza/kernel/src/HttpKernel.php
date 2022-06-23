@@ -2,6 +2,7 @@
 namespace Terrazza\Kernel;
 
 use Terrazza\Http\Message\HttpMessageAdapter;
+use Terrazza\Http\Message\Uri\Uri;
 use Terrazza\Http\Request\HttpServerRequestBuilder;
 use Terrazza\Http\Request\HttpServerRequestHandlerInterface;
 use Terrazza\Http\Response\HttpResponse;
@@ -11,7 +12,6 @@ use Terrazza\Http\Routing\HttpRequestHandlerBuilderInterface;
 use Terrazza\Http\Routing\HttpRouterInterface;
 use Terrazza\Kernel\Helper\LoggerHelper;
 use Terrazza\Injector\Injector;
-use Terrazza\Logger\Logger;
 use Throwable;
 
 class HttpKernel {
@@ -24,14 +24,13 @@ class HttpKernel {
 
     public function handle(string $applicationName, string $diConfigPath) : void {
         $logger                                     = (new LoggerHelper($applicationName))
-            ->createLogger(Logger::INFO, "../logger.log");
+            ->createLogger($this->debug, ".".$this->env.".access.log");
         try {
             $diConfigFile                           = $diConfigPath . DIRECTORY_SEPARATOR . "di.config.php";
             if (!file_exists($diConfigFile)) {
                 throw new \RuntimeException("$diConfigFile does not exists");
             }
             $injector                               = new Injector(require_once($diConfigFile), $logger);
-
             // get request from server
             $request                                = (new HttpServerRequestBuilder)->getServerRequest();
 

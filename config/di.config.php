@@ -22,7 +22,7 @@ return [
     HttpRouterInterface::class                      => HttpRouterFactory::class,
 
     HttpRouteLoaderInterface::class                 => OpenApiYaml::class,
-    OpenApiYaml::class                              => ["yamlFilename" => "../api.yaml"],
+    OpenApiYaml::class                              => ["yamlFilename" => getenv("APP_CONFIG_FOLDER")."/api.yaml"],
 
     /** routing - requestHandlerBuilder */
     HttpRequestHandlerBuilderInterface::class       => OperationClassMethodRequestHandler::class,
@@ -33,5 +33,6 @@ return [
     HttpServerRequestHandlerInterface::class        => \Terrazza\Http\Request\HttpServerRequestMiddlewareHandler::class,
     \Terrazza\Http\Request\HttpServerRequestMiddlewareHandler::class => [
         \Terrazza\Http\Routing\Utility\HttpServerRequestLoggerUtility::class,
+        \Terrazza\Http\Routing\Utility\HttpServerRequestExceptionUtility::class
     ]
 ];

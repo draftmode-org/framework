@@ -6,8 +6,8 @@ use Terrazza\Http\Response\HttpResponseInterface;
 class HttpServerRequestMiddlewareHandler implements HttpServerRequestHandlerInterface {
     /** @var HttpServerRequestHandlerInterface[]  */
     private array $middlewares;
-    public function __construct(...$middlewares) {
-        $this->middlewares                          = []; //$middlewares;
+    public function __construct(HttpServerRequestHandlerInterface ...$middlewares) {
+        $this->middlewares                          = $middlewares;
     }
 
     /**

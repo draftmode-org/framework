@@ -235,12 +235,24 @@ class Injector implements InjectorInterface {
      */
     private function getMethodArgs(ReflectionFunctionAbstract $method, array $extraMapping=null): array {
         $args                                       = [];
-        foreach($method->getParameters() as $parameter) {
+        $methodParams                               = $method->getParameters();
+        foreach($methodParams as $parameter) {
             $paramKey                               = $parameter->getName();
             $this->pushTraceKey($paramKey);
             if ($extraMapping && array_key_exists($paramKey, $extraMapping)) {
+                $this->logger->debug("extraMapping, arrayKey($paramKey) exists");
                 $result                             = $extraMapping[$paramKey];
+            } elseif ($extraMapping && $parameter->isVariadic()) {
+                $this->logger->debug("extraMapping, variadic($paramKey)");
+                $type                               = $parameter->getType();
+                $result                             = null;
+                if (($type instanceof ReflectionNamedType) && !$type->isBuiltin()) {
+                    foreach ($extraMapping as $vExtraMapping) {
+                        $result[]                       = $this->get($vExtraMapping);
+                    }
+                }
             } else {
+                $this->logger->debug("!extraMapping or !arrayKey($paramKey) exists");
                 $type                               = $parameter->getType();
                 $result                             = null;
                 if (($type instanceof ReflectionNamedType) && !$type->isBuiltin()) {
@@ -258,7 +270,15 @@ class Injector implements InjectorInterface {
                     }
                 }
             }
-            $args[]                                 = $result;
+            if ($parameter->isVariadic()) {
+                if (is_array($result) && count($result)) {
+                    $args                           = array_merge($args, array_values($result));
+                } else {
+                    $args[]                         = null;
+                }
+            } else {
+                $args[]                             = $result;
+            }
             $this->popTraceKey();
         }
         return $args;

@@ -204,10 +204,12 @@ class HttpMessageAdapter implements HttpMessageAdapterInterface {
         $hasQuery                                   = false;
         if (isset($_SERVER['REQUEST_URI'])) {
             $requestUriParts                        = explode('?', $_SERVER['REQUEST_URI'], 2);
+            /*
 			$scriptDir                              = dirname($_SERVER['SCRIPT_NAME']);
 			if (strpos($requestUriParts[0], $scriptDir) === 0) {
 				$requestUriParts[0]                 = substr($requestUriParts[0], strlen($scriptDir));
 			}
+            */
             $uri                                    = $uri->withPath($requestUriParts[0]);
             if (isset($requestUriParts[1])) {
                 $hasQuery                           = true;
