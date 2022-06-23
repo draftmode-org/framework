@@ -4,4 +4,4 @@
 /plugin/composer/
 /plugin/psr/
 /plugin/autoload.php
-/logger.log
+/public/.*

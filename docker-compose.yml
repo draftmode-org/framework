@@ -1,0 +1,32 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    volumes:
+      - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./.docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    links:
+      - php
+    volumes_from:
+      - app-data
+  php:
+    container_name: php-container
+    build:
+      context: ./.docker
+      dockerfile: php.Dockerfile
+    volumes_from:
+      - app-data
+  app-data:
+    build:
+      context: ./.docker
+      dockerfile: php.Dockerfile
+    container_name: app-data-container
+    volumes:
+      - ./public:/var/shared/app/public
+      - ./plugin:/var/shared/app/plugin
+      - ./src:/var/shared/app/src
+      - ./config:/var/shared/app/config
+    command: "true"
+
