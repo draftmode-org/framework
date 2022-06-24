@@ -109,3 +109,10 @@ add
 {sharedName} {insideFolderName} vboxsf defaults 0 0
 ```
 >$ sudo reboot
+
+##(8) add required packages (inside nginx, I guess)
+1. libnss3-tools = use certutil for ssl certifications
+```
+sudo apt-get update       
+sudo apt-get install -y libnss3-tools
+```
