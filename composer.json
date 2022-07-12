@@ -13,7 +13,7 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.0",
     "psr/log": "1.1.*",
     "psr/http-message": "1.*",
     "psr/http-client": "1.*",
@@ -42,7 +42,10 @@
       "Terrazza\\Http\\" : "plugin/terrazza/http/src",
       "Terrazza\\Logger\\" : "plugin/terrazza/logger/src",
       "Terrazza\\Logger\\Utility\\" : "plugin/terrazza/logger/utility",
-      "Terrazza\\Injector\\" : "plugin/terrazza/injector/src"
+      "Terrazza\\Injector\\" : "plugin/terrazza/injector/src",
+      "Terrazza\\Property\\" : "plugin/terrazza/property/src",
+      "Terrazza\\Annotation\\" : "plugin/terrazza/annotation/src",
+      "Terrazza\\Deserializer\\" : "plugin/terrazza/deserializer/src"
     }
   }
 }

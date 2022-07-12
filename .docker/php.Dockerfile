@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine as production-php-alpine
+FROM php:8.0-fpm-alpine as production-php-alpine
 
 ENV BUILD_DEPS \
     curl curl-dev \
